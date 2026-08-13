@@ -12,6 +12,9 @@ load_dotenv()
 from app.api.v1.endpoints import whatsapp
 from app.services.webhook_sync import sync_webhook
 
+from app.api import webhook_routes, file_routes
+from app.services.campaign_scheduler import start_scheduler, shutdown_scheduler, process_campaign
+
 # Configure Logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -67,11 +70,15 @@ async def lifespan(app: FastAPI):
     # Fire-and-forget: sync runs AFTER the server is live
     t = threading.Thread(target=_background_webhook_sync, daemon=True)
     t.start()
+    
+    # Start Outreach Campaign Scheduler
+    start_scheduler()
 
     yield  # Server is running and accepting connections
 
     # ── SHUTDOWN ──
     logger.info("👋 Aatomate API shutting down...")
+    shutdown_scheduler()
 
 
 app = FastAPI(title="Aatomate AI WhatsApp CRM", lifespan=lifespan)
@@ -87,6 +94,8 @@ app.add_middleware(
 
 # Include Routers
 app.include_router(whatsapp.router, tags=["WhatsApp Webhook"])
+app.include_router(webhook_routes.router, prefix="/api/webhooks", tags=["Webhooks"])
+app.include_router(file_routes.router, prefix="/api/files", tags=["Files"])
 
 @app.get("/")
 def read_root():
@@ -106,3 +115,20 @@ async def manual_webhook_sync():
         "message": "Webhook synced successfully" if success else "Webhook sync failed — check server logs"
     }
 
+# ── Manual campaign trigger endpoint ──
+from pydantic import BaseModel
+from typing import Optional
+
+class CampaignSendRequest(BaseModel):
+    campaign_id: Optional[str] = None
+
+@app.post("/api/campaigns/send")
+async def manual_campaign_send(payload: CampaignSendRequest = CampaignSendRequest()):
+    """
+    Manually trigger email sending for a specific campaign.
+    Body: { "campaign_id": "uuid" }
+    If no campaign_id provided, processes all active campaigns.
+    """
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(None, lambda: process_campaign(payload.campaign_id))
+    return result

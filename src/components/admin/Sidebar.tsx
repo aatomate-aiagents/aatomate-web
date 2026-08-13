@@ -16,12 +16,14 @@ import {
   MessageCircle,
   MessageSquare,
   Box,
-  HelpCircle
+  HelpCircle,
+  Mail
 } from "lucide-react";
 import clsx from "clsx";
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Cold Email", href: "/admin/outreach", icon: Mail },
   { name: "Inbox", href: "/admin/inbox", icon: MessageCircle },
   { name: "Leads", href: "/admin/leads", icon: Users },
   { name: "Demo Schedule", href: "/admin/demos", icon: Calendar },

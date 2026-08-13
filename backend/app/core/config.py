@@ -9,6 +9,13 @@ class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
     OPENAI_API_KEY: str = ""
+    
+    # Merged from python-service
+    PROJECT_NAME: str = "Aatomate Outreach"
+    REDIS_URL: str = "redis://localhost:6379/0"
+    FIREBASE_CREDENTIALS_PATH: str = "firebase-service-account.json"
+    ANTHROPIC_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
 
     class Config:
         env_file = ".env"
