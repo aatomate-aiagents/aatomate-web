@@ -15,7 +15,7 @@ except Exception as e:
     logger.error(f"Failed to initialize Supabase for scheduler: {e}")
     supabase = None
 
-def send_hostinger_email(api_token: str, mailbox_id: str, to_email: str, subject: str, body: str):
+def send_hostinger_email(api_token: str, mailbox_id: str, to_email: str, subject: str, body: str, attachments: list = None):
     """
     Real implementation using the Hostinger Agentic Mail API.
     Endpoint: POST /api/v1/mailboxes/{mailboxResourceId}/send
@@ -31,6 +31,8 @@ def send_hostinger_email(api_token: str, mailbox_id: str, to_email: str, subject
         "subject": subject,
         "text": body
     }
+    if attachments:
+        payload["attachments"] = attachments
     
     try:
         response = httpx.post(url, json=payload, headers=headers, timeout=15.0)
@@ -145,6 +147,37 @@ def process_campaign(campaign_id: str = None):
             logger.info(f"[Scheduler]   Found {len(pending_contacts)} pending contacts. Sending up to {send_allowance}...")
             emails_sent = 0
             
+            # Prepare attachment if exists
+            attachments = None
+            attachment_path = campaign.get('attachment_path')
+            attachment_name = campaign.get('attachment_name') or "brochure.pdf"
+            
+            if attachment_path:
+                import os
+                import base64
+                if os.path.exists(attachment_path):
+                    try:
+                        with open(attachment_path, "rb") as f:
+                            file_content = f.read()
+                            b64_content = base64.b64encode(file_content).decode('utf-8')
+                            
+                        # Infer content type simply from extension
+                        ext = attachment_name.split('.')[-1].lower() if '.' in attachment_name else 'pdf'
+                        content_type = "application/pdf"
+                        if ext in ['png', 'jpg', 'jpeg']:
+                            content_type = f"image/{ext if ext != 'jpg' else 'jpeg'}"
+                            
+                        attachments = [{
+                            "filename": attachment_name,
+                            "content": b64_content,
+                            "contentType": content_type
+                        }]
+                        logger.info(f"[Scheduler]   Loaded attachment: {attachment_name}")
+                    except Exception as e:
+                        logger.error(f"[Scheduler]   Failed to load attachment: {e}")
+                else:
+                    logger.warning(f"[Scheduler]   Attachment path not found on disk: {attachment_path}")
+            
             # 4. Send emails
             for contact in pending_contacts:
                 to_email = contact['email']
@@ -159,7 +192,7 @@ def process_campaign(campaign_id: str = None):
                 logger.info(f"[Scheduler]   Sending to: {to_email} ...")
                 
                 # Send the email
-                success = send_hostinger_email(api_token, mailbox_id, to_email, subject, body)
+                success = send_hostinger_email(api_token, mailbox_id, to_email, subject, body, attachments=attachments)
                 
                 if success:
                     # Update contact status with real timestamp

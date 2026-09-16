@@ -48,6 +48,8 @@ type Campaign = {
   daily_limit: number;
   status: string;
   created_at: string;
+  attachment_name?: string;
+  attachment_path?: string;
 };
 
 export default function OutreachClient({
@@ -78,7 +80,8 @@ export default function OutreachClient({
 
   // Forms
   const [importFile, setImportFile] = useState<File | null>(null);
-  const [campaignForm, setCampaignForm] = useState({ name: '', account_id: '', import_id: '', template_subject: '', template_body: '', daily_limit: 50 });
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [campaignForm, setCampaignForm] = useState({ name: '', account_id: '', import_id: '', template_subject: '', template_body: '', daily_limit: 50, attachment_name: '', attachment_path: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Auto-sync mailboxes from Hostinger on page load
@@ -226,12 +229,42 @@ export default function OutreachClient({
   const handleCreateCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const { data, error } = await supabase.from('outreach_campaigns').insert([campaignForm]).select();
+    
+    let attachmentPath = '';
+    let attachmentName = '';
+    
+    if (attachmentFile) {
+      try {
+        const formData = new FormData();
+        formData.append('file', attachmentFile);
+        const res = await fetch('http://127.0.0.1:8000/api/files/upload-brochure', {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) throw new Error("Upload failed");
+        const json = await res.json();
+        attachmentPath = json.path;
+        attachmentName = json.filename;
+      } catch (err: any) {
+        alert("Failed to upload brochure: " + err.message);
+        setIsSubmitting(false);
+        return;
+      }
+    }
+    
+    const payload = { ...campaignForm };
+    if (attachmentPath) {
+      payload.attachment_name = attachmentName;
+      payload.attachment_path = attachmentPath;
+    }
+    
+    const { data, error } = await supabase.from('outreach_campaigns').insert([payload]).select();
     setIsSubmitting(false);
     if (!error && data) {
       setCampaigns([data[0], ...campaigns]);
       setShowCampaignModal(false);
-      setCampaignForm({ name: '', account_id: '', import_id: '', template_subject: '', template_body: '', daily_limit: 50 });
+      setCampaignForm({ name: '', account_id: '', import_id: '', template_subject: '', template_body: '', daily_limit: 50, attachment_name: '', attachment_path: '' });
+      setAttachmentFile(null);
     } else {
       alert("Error creating campaign: " + error?.message);
     }
@@ -418,6 +451,11 @@ export default function OutreachClient({
           <div className="text-xs text-gray-500 space-y-0.5">
             <div><span className="font-medium">From:</span> {acc?.email || 'Unknown'}</div>
             <div><span className="font-medium">List:</span> {imp?.file_name || 'Unknown'}</div>
+            {camp.attachment_name && (
+              <div className="text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 mt-1">
+                📎 {camp.attachment_name}
+              </div>
+            )}
           </div>
         );
       }
@@ -582,6 +620,11 @@ export default function OutreachClient({
                   <input required type="text" value={campaignForm.template_subject} onChange={e => setCampaignForm({...campaignForm, template_subject: e.target.value})} placeholder="Subject Line" className="w-full px-3 py-2 bg-gray-50 dark:bg-[#151515] border border-gray-200 dark:border-[#2A2A2A] rounded-lg dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-action-green)]" />
                   <textarea required value={campaignForm.template_body} onChange={e => setCampaignForm({...campaignForm, template_body: e.target.value})} placeholder="Write your email body here..." rows={6} className="w-full px-3 py-2 bg-gray-50 dark:bg-[#151515] border border-gray-200 dark:border-[#2A2A2A] rounded-lg dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--color-action-green)]"></textarea>
                 </div>
+              </div>
+
+              <div className="pt-2 border-t border-gray-200 dark:border-gray-800">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-2">Attachment (Optional)</h3>
+                <input type="file" onChange={e => setAttachmentFile(e.target.files?.[0] || null)} accept=".pdf,.png,.jpg,.jpeg" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[var(--color-action-green)] file:text-black hover:file:bg-[#b0f5a6] cursor-pointer" />
               </div>
 
               <div className="flex gap-4 pt-4">

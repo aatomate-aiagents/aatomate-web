@@ -118,6 +118,10 @@ async def receive_whatsapp_message(request: Request, background_tasks: Backgroun
                         elif interactive.get("type") == "list_reply" and "list_reply" in interactive:
                             interactive_id = interactive["list_reply"].get("id")
                             interactive_title = interactive["list_reply"].get("title")
+                        elif interactive.get("type") == "nfm_reply" and "nfm_reply" in interactive:
+                            interactive_id = "flow_submission"
+                            interactive_title = "Flow Submitted"
+                            logger.info(f"[webhook] Received Flow Submission data: {interactive['nfm_reply'].get('response_json')}")
                         
                         logger.info(f"[webhook] Interactive message from {phone_number}: id={interactive_id} title='{interactive_title}'")
                         background_tasks.add_task(handle_incoming_message, phone_number, interactive_title, True, interactive_id)

@@ -160,3 +160,35 @@ async def process_file(file: UploadFile = File(...)):
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
 
+
+@router.post("/upload-brochure")
+async def upload_brochure(file: UploadFile = File(...)):
+    """
+    Uploads a brochure file (e.g. PDF) for use in email campaigns.
+    Saves the file to the local uploads directory.
+    """
+    import uuid
+    import shutil
+    
+    # Create uploads directory if it doesn't exist
+    upload_dir = os.path.join(os.getcwd(), "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
+    
+    # Generate unique filename to avoid overwrites
+    file_ext = file.filename.split('.')[-1] if file.filename and '.' in file.filename else 'pdf'
+    unique_filename = f"{uuid.uuid4().hex}.{file_ext}"
+    file_path = os.path.join(upload_dir, unique_filename)
+    
+    try:
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+            
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "path": file_path
+        }
+    except Exception as e:
+        print(f"Failed to upload brochure: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
