@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { Award, CheckCircle, XCircle } from "lucide-react";
+import { Award, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import CertificateTemplate from "@/components/CertificateTemplate";
 
 export default async function VerifyCertificatePage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
@@ -33,18 +34,43 @@ export default async function VerifyCertificatePage({ params }: { params: { id: 
 
   const isValid = cert.status === 'valid';
 
+  if (isValid) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-[#050505] p-6">
+        <div className="max-w-[1100px] mx-auto mb-6 p-4 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-2xl flex items-center gap-4 shadow-sm print:hidden">
+            <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="text-emerald-600 dark:text-emerald-400" size={24} />
+            </div>
+            <div>
+                <h2 className="text-lg font-bold text-emerald-800 dark:text-emerald-300">Certificate Verified</h2>
+                <p className="text-emerald-600 dark:text-emerald-400 text-sm">This is a valid, authentic certificate issued by Aatomate.</p>
+            </div>
+        </div>
+        <CertificateTemplate
+          participantName={cert.student_name}
+          bootcampName={cert.bootcamp_name}
+          internshipName={cert.internship_name}
+          category={cert.internship_category || cert.bootcamp_category}
+          dateOfParticipation={new Date(cert.completion_date).toLocaleDateString()}
+          certificateId={cert.id}
+          type={cert.type}
+          issuingAuthority={cert.issuing_authority}
+        />
+      </div>
+    );
+  }
+
+  // Revoked state
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#050505] p-6">
       <div className="max-w-2xl w-full bg-white dark:bg-[#0a0a0a] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl">
-        <div className={`p-8 text-center ${isValid ? 'bg-blue-600' : 'bg-red-600'}`}>
+        <div className="p-8 text-center bg-red-600">
           <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-6 ring-4 ring-white/30">
-            {isValid ? <CheckCircle size={48} className="text-white" /> : <XCircle size={48} className="text-white" />}
+            <AlertTriangle size={48} className="text-white" />
           </div>
-          <h1 className="text-3xl font-black text-white mb-2">
-            {isValid ? 'Certificate Verified' : 'Certificate Revoked'}
-          </h1>
+          <h1 className="text-3xl font-black text-white mb-2">Certificate Revoked</h1>
           <p className="text-white/80 text-lg">
-            {isValid ? 'This is a valid, authentic certificate.' : `This certificate was revoked on ${new Date(cert.revoked_at).toLocaleDateString()}.`}
+            This certificate was revoked on {new Date(cert.revoked_at).toLocaleDateString()}.
           </p>
         </div>
 
@@ -76,7 +102,7 @@ export default async function VerifyCertificatePage({ params }: { params: { id: 
             </div>
           </div>
 
-          {!isValid && cert.revocation_reason && (
+          {cert.revocation_reason && (
             <div className="mt-8 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl">
               <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-1">Reason for Revocation</p>
               <p className="text-red-700 dark:text-red-300">{cert.revocation_reason}</p>
