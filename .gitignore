@@ -46,3 +46,4 @@ venv/
 __pycache__/
 *.pyc
 .env
+backend/uploads/
