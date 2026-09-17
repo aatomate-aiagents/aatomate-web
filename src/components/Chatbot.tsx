@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageSquare, X, Send, Bot, User, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -97,6 +98,7 @@ function findResponse(input: string): string {
 }
 
 export default function Chatbot() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -180,6 +182,11 @@ export default function Chatbot() {
       return <span key={i}>{part}</span>;
     });
   };
+
+  // Hide on certificate verify pages and admin certificate view
+  if (pathname?.startsWith('/verify') || pathname?.startsWith('/certificate')) {
+    return null;
+  }
 
   return (
     <>
