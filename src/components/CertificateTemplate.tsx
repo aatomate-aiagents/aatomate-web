@@ -227,19 +227,38 @@ export default function CertificateTemplate({
                     {/* ── FOOTER ── */}
                     <footer className="relative flex items-end justify-between px-10 pb-7 pt-4" style={{ borderTop: '1px solid rgba(13,61,86,0.08)' }}>
 
-                        {/* Signature block */}
-                        <div className="flex flex-col items-start">
-                            <div className="h-12 mb-1.5 flex items-end">
-                                <img
-                                    src="/amit-signature.jpg"
-                                    alt="Amit Dhiman"
-                                    className="h-12 w-auto object-contain"
-                                    style={{ mixBlendMode: 'multiply', filter: 'contrast(1.5) brightness(0.85)' }}
-                                />
+                        {/* Two signature blocks */}
+                        <div className="flex items-end gap-10">
+                            {/* Amit Dhiman – Co-Founder */}
+                            <div className="flex flex-col items-start">
+                                <div className="h-12 mb-1.5 flex items-end">
+                                    <img
+                                        src="/sig-amit.jpg"
+                                        alt="Amit Dhiman Signature"
+                                        className="h-12 w-auto object-contain"
+                                        style={{ mixBlendMode: 'multiply', filter: 'contrast(1.5) brightness(0.85)' }}
+                                    />
+                                </div>
+                                <div className="pt-2 w-40" style={{ borderTop: '2px solid #0d3d56' }}>
+                                    <p className="font-bold text-[#0d3d56] text-[11px] tracking-wide">Amit Dhiman</p>
+                                    <p className="text-[8px] text-slate-400 uppercase tracking-widest mt-0.5">Co-Founder, Aatomate</p>
+                                </div>
                             </div>
-                            <div className="pt-2 w-44" style={{ borderTop: '2px solid #0d3d56' }}>
-                                <p className="font-bold text-[#0d3d56] text-[11px] tracking-wide">Amit Dhiman</p>
-                                <p className="text-[8px] text-slate-400 uppercase tracking-widest mt-0.5">Co-Founder &amp; CEO, Aatomate</p>
+
+                            {/* A. Priyanka – Founder */}
+                            <div className="flex flex-col items-start">
+                                <div className="h-12 mb-1.5 flex items-end">
+                                    <img
+                                        src="/sig-priyanka.jpg"
+                                        alt="A. Priyanka Signature"
+                                        className="h-12 w-auto object-contain"
+                                        style={{ mixBlendMode: 'multiply', filter: 'contrast(1.5) brightness(0.85)' }}
+                                    />
+                                </div>
+                                <div className="pt-2 w-40" style={{ borderTop: '2px solid #0d3d56' }}>
+                                    <p className="font-bold text-[#0d3d56] text-[11px] tracking-wide">A. Priyanka</p>
+                                    <p className="text-[8px] text-slate-400 uppercase tracking-widest mt-0.5">Founder, Aatomate</p>
+                                </div>
                             </div>
                         </div>
 
@@ -263,6 +282,7 @@ export default function CertificateTemplate({
                             </div>
                         </div>
                     </footer>
+
                 </div>
             </motion.div>
         </div>
