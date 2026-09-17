@@ -64,11 +64,19 @@ export default function CertificateTemplate({
                     @page { size: A4 landscape; margin: 0; }
                     html, body { width: 297mm; height: 210mm; }
                     body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     .no-print { display: none !important; }
                     #cert-container {
                         position: absolute; left: 0; top: 0;
                         width: 297mm; height: 210mm;
                         border-radius: 0 !important;
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                    }
+                    .cert-spine {
+                        -webkit-print-color-adjust: exact !important;
+                        print-color-adjust: exact !important;
+                        background: linear-gradient(180deg, #0d3d56 0%, #0e7490 50%, #0d3d56 100%) !important;
                     }
                 }
             `}} />
@@ -108,23 +116,27 @@ export default function CertificateTemplate({
                 }}
             >
                 {/* ── LEFT TEAL SPINE ── */}
-                <div className="absolute left-0 top-0 h-full w-[54px] z-10 flex flex-col items-center justify-between py-8"
-                    style={{ background: 'linear-gradient(180deg, #0d3d56 0%, #0e7490 50%, #0d3d56 100%)' }}>
+                <div
+                    className="cert-spine absolute left-0 top-0 h-full w-[54px] z-10 flex flex-col items-center justify-between py-8"
+                    style={{
+                        background: 'linear-gradient(180deg, #0d3d56 0%, #0e7490 50%, #0d3d56 100%)',
+                        WebkitPrintColorAdjust: 'exact',
+                        printColorAdjust: 'exact'
+                    } as React.CSSProperties}
+                >
                     {/* Top circle logo */}
-                    <div className="w-9 h-9 rounded-full bg-white/15 border border-white/20 flex items-center justify-center">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}>
                         <img src="/aatomate.jpeg" alt="" className="w-7 h-7 object-contain rounded-full" />
                     </div>
                     {/* Rotated text */}
                     <span
-                        className="text-white/60 font-bold tracking-[0.35em] uppercase flex-1 flex items-center justify-center"
-                        style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: '8px', letterSpacing: '0.35em' }}
+                        style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: '8px', letterSpacing: '0.35em', color: 'rgba(255,255,255,0.6)', fontWeight: 'bold', textTransform: 'uppercase', flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
                         Certificate of {type === 'internship' ? 'Completion' : 'Participation'} · Aatomate
                     </span>
                     {/* Bottom ID */}
                     <span
-                        className="text-white/40 font-mono"
-                        style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: '7px', letterSpacing: '0.2em' }}
+                        style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: '7px', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace' }}
                     >
                         {shortId}
                     </span>
