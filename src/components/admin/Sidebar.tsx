@@ -17,7 +17,8 @@ import {
   MessageSquare,
   Box,
   HelpCircle,
-  Mail
+  Mail,
+  Award
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -36,6 +37,7 @@ const navItems = [
   { name: "Pricing", href: "/admin/pricing", icon: CreditCard },
   { name: "Testimonials", href: "/admin/testimonials", icon: Users },
   { name: "FAQs", href: "/admin/faqs", icon: FileText },
+  { name: "Certificates", href: "/admin/certificates", icon: Award },
 ];
 
 export default function Sidebar() {
