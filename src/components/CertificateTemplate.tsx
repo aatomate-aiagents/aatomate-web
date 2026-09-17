@@ -192,10 +192,16 @@ export default function CertificateTemplate({
                                 This is proudly awarded to
                             </p>
 
-                            {/* Name */}
+                            {/* Name — scales down for long names, never clips */}
                             <h2
-                                className="cert-name-text font-black tracking-tight leading-none mb-5"
-                                style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(48px, 6vw, 68px)' }}
+                                className="cert-name-text font-black tracking-tight leading-none mb-5 w-full"
+                                style={{
+                                    fontFamily: "'Playfair Display', serif",
+                                    fontSize: 'clamp(32px, 5vw, 64px)',
+                                    wordBreak: 'break-word',
+                                    overflowWrap: 'break-word',
+                                    lineHeight: 1.1,
+                                }}
                             >
                                 {participantName}
                             </h2>
@@ -239,38 +245,19 @@ export default function CertificateTemplate({
                     {/* ── FOOTER ── */}
                     <footer className="relative flex items-end justify-between px-10 pb-7 pt-4" style={{ borderTop: '1px solid rgba(13,61,86,0.08)' }}>
 
-                        {/* Two signature blocks */}
-                        <div className="flex items-end gap-10">
-                            {/* Amit Dhiman – Co-Founder */}
-                            <div className="flex flex-col items-start">
-                                <div className="h-12 mb-1.5 flex items-end">
-                                    <img
-                                        src="/sig-amit.jpg"
-                                        alt="Amit Dhiman Signature"
-                                        className="h-12 w-auto object-contain"
-                                        style={{ mixBlendMode: 'multiply', filter: 'contrast(1.5) brightness(0.85)' }}
-                                    />
-                                </div>
-                                <div className="pt-2 w-40" style={{ borderTop: '2px solid #0d3d56' }}>
-                                    <p className="font-bold text-[#0d3d56] text-[11px] tracking-wide">Amit Dhiman</p>
-                                    <p className="text-[8px] text-slate-400 uppercase tracking-widest mt-0.5">Co-Founder, Aatomate</p>
-                                </div>
+                        {/* Single signature — Amit Dhiman */}
+                        <div className="flex flex-col items-start">
+                            <div className="h-14 mb-1.5 flex items-end">
+                                <img
+                                    src="/sig-amit-real.jpg"
+                                    alt="Amit Dhiman Signature"
+                                    className="h-14 w-auto object-contain"
+                                    style={{ mixBlendMode: 'multiply', filter: 'contrast(1.6) brightness(0.8) saturate(0.9)' }}
+                                />
                             </div>
-
-                            {/* A. Priyanka – Founder */}
-                            <div className="flex flex-col items-start">
-                                <div className="h-12 mb-1.5 flex items-end">
-                                    <img
-                                        src="/sig-priyanka.jpg"
-                                        alt="A. Priyanka Signature"
-                                        className="h-12 w-auto object-contain"
-                                        style={{ mixBlendMode: 'multiply', filter: 'contrast(1.5) brightness(0.85)' }}
-                                    />
-                                </div>
-                                <div className="pt-2 w-40" style={{ borderTop: '2px solid #0d3d56' }}>
-                                    <p className="font-bold text-[#0d3d56] text-[11px] tracking-wide">A. Priyanka</p>
-                                    <p className="text-[8px] text-slate-400 uppercase tracking-widest mt-0.5">Founder, Aatomate</p>
-                                </div>
+                            <div className="pt-2 w-44" style={{ borderTop: '2px solid #0d3d56' }}>
+                                <p className="font-bold text-[#0d3d56] text-[11px] tracking-wide">Amit Dhiman</p>
+                                <p className="text-[8px] text-slate-400 uppercase tracking-widest mt-0.5">Co-Founder &amp; CEO, Aatomate</p>
                             </div>
                         </div>
 
